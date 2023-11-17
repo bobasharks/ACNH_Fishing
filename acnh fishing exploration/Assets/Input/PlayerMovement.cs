@@ -35,6 +35,15 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Casting"",
+                    ""type"": ""Button"",
+                    ""id"": ""f368e3b1-80d9-4a80-b057-91e294a9521c"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -92,6 +101,17 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
                     ""action"": ""Walking"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""460f5a01-9f60-4af6-9de5-e118983b9841"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Casting"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -101,6 +121,7 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
         // Controls
         m_Controls = asset.FindActionMap("Controls", throwIfNotFound: true);
         m_Controls_Walking = m_Controls.FindAction("Walking", throwIfNotFound: true);
+        m_Controls_Casting = m_Controls.FindAction("Casting", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -163,11 +184,13 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Controls;
     private List<IControlsActions> m_ControlsActionsCallbackInterfaces = new List<IControlsActions>();
     private readonly InputAction m_Controls_Walking;
+    private readonly InputAction m_Controls_Casting;
     public struct ControlsActions
     {
         private @PlayerMovement m_Wrapper;
         public ControlsActions(@PlayerMovement wrapper) { m_Wrapper = wrapper; }
         public InputAction @Walking => m_Wrapper.m_Controls_Walking;
+        public InputAction @Casting => m_Wrapper.m_Controls_Casting;
         public InputActionMap Get() { return m_Wrapper.m_Controls; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -180,6 +203,9 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
             @Walking.started += instance.OnWalking;
             @Walking.performed += instance.OnWalking;
             @Walking.canceled += instance.OnWalking;
+            @Casting.started += instance.OnCasting;
+            @Casting.performed += instance.OnCasting;
+            @Casting.canceled += instance.OnCasting;
         }
 
         private void UnregisterCallbacks(IControlsActions instance)
@@ -187,6 +213,9 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
             @Walking.started -= instance.OnWalking;
             @Walking.performed -= instance.OnWalking;
             @Walking.canceled -= instance.OnWalking;
+            @Casting.started -= instance.OnCasting;
+            @Casting.performed -= instance.OnCasting;
+            @Casting.canceled -= instance.OnCasting;
         }
 
         public void RemoveCallbacks(IControlsActions instance)
@@ -207,5 +236,6 @@ public partial class @PlayerMovement: IInputActionCollection2, IDisposable
     public interface IControlsActions
     {
         void OnWalking(InputAction.CallbackContext context);
+        void OnCasting(InputAction.CallbackContext context);
     }
 }

@@ -4,15 +4,39 @@ using UnityEngine;
 
 public class Bobber : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public static Bobber instance;
+    public bool inWater = false;
+    private float easing = .1f;
+
+    private void Awake()
     {
-        
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            instance = this;
+        }
+    }
+    // Start is called before the first frame update
+    private void Update()
+    {
+        Vector3 bobberEndPos = Player.instance.bobberEndPosObj.transform.position;
+        bobberEndPos = Vector3.Lerp(transform.position, bobberEndPos, easing);
+
+        transform.position = bobberEndPos;
+
+        //transform.position = Vector3.Lerp(transform.position, Player.instance.bobberEndPos, u * Time.deltaTime);
+
+
     }
 
-    // Update is called once per frame
-    void Update()
+    private void OnTriggerEnter(Collider other)
     {
-        
+        if (other.gameObject.tag == "Water")
+        {
+            inWater = true;
+        }
     }
 }

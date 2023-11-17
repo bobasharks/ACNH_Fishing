@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour
     private float speed = 6f;
     public bool moving;
     private GameObject playerModel;
+    private Quaternion startRot;
     //private Vector2 left, right, up, down;
 
     private void Awake()
@@ -36,38 +37,77 @@ public class PlayerController : MonoBehaviour
         
         //gets the vector2 data from the move action composite
         Vector2 moveVec = playerMovement.Controls.Walking.ReadValue<Vector2>();
+
+        Quaternion initialRot = playerModel.transform.rotation;
+
         transform.Translate(new Vector3(moveVec.x, 0, moveVec.y) * speed * Time.deltaTime);
 
         if (moveVec.x <= -1)
         {
             forward = moveVec.x *= -1;
-            print("going left");
-            playerModel.transform.rotation = Quaternion.Euler(0, 270, 0);
+            //print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 270, 0), speed * Time.deltaTime);
+            //playerModel.transform.rotation = Quaternion.Euler(0, 270, 0);
             
         }
-        if (moveVec.x >= 1)
+
+        //the following code doesn't work bc input system does not read two composites at once
+
+        /*
+        else if (moveVec.x <= -1 && moveVec.y <= -1)
+        {
+            forward = moveVec.x *= -1;
+            print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 315, 0), speed * Time.deltaTime);
+        }
+        else if (moveVec.x >= 1 && moveVec.y <= -1)
         {
             forward = moveVec.x;
-            print("going right");
-            playerModel.transform.rotation = Quaternion.Euler(0, 90, 0);
+            print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 225, 0), speed * Time.deltaTime);
+        }
+        else if (moveVec.x <= -1 && moveVec.y >= 1)
+        {
+            forward = moveVec.x *= -1;
+            print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 135, 0), speed * Time.deltaTime);
+        }
+        else if (moveVec.x >= 1 && moveVec.y >= 1)
+        {
+            forward = moveVec.x;
+            print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 45, 0), speed * Time.deltaTime);
+        }
+        */
+        else if (moveVec.x >= 1)
+        {
+            forward = moveVec.x;
+            //print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 90, 0), speed * Time.deltaTime);
+            //playerModel.transform.rotation = Quaternion.Euler(0, 90, 0);
             //moving = true;
         }
-        if (moveVec.y >= 1)
+        else if (moveVec.y >= 1)
         {
             forward = moveVec.y;
             //moving = true;
-            print("going up");
-            playerModel.transform.rotation = Quaternion.Euler(0, 0, 0);
+            //print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 0, 0), speed * Time.deltaTime);
+            //playerModel.transform.rotation = Quaternion.Euler(0, 0, 0);
             //moving = true;
         }
-        if (moveVec.y <= -1)
+        else if (moveVec.y <= -1)
         {
             forward = moveVec.y *= -1;
-            print("going down");
-            playerModel.transform.rotation = Quaternion.Euler(0, 180, 0);
+            //print(moveVec);
+            playerModel.transform.rotation = Quaternion.Slerp(initialRot, Quaternion.Euler(0, 180, 0), speed * Time.deltaTime);
+            //playerModel.transform.rotation = Quaternion.Euler(0, 180, 0);
             //moving = true;
         }
-        
+        else
+        {
+            forward = moveVec.y;
+        }
 
         //sets the forward variable that controls the animation states
         //forward = moveVec.y;
