@@ -7,6 +7,7 @@ public class Bobber : MonoBehaviour
     public static Bobber instance;
     public bool inWater = false;
     private float easing = .1f;
+    Rigidbody rb;
 
     private void Awake()
     {
@@ -18,6 +19,9 @@ public class Bobber : MonoBehaviour
         {
             instance = this;
         }
+
+        rb = GetComponent<Rigidbody>();
+
     }
     // Start is called before the first frame update
     private void Update()
@@ -26,7 +30,7 @@ public class Bobber : MonoBehaviour
         bobberEndPos = Vector3.Lerp(transform.position, bobberEndPos, easing);
 
         transform.position = bobberEndPos;
-
+        
         //transform.position = Vector3.Lerp(transform.position, Player.instance.bobberEndPos, u * Time.deltaTime);
 
 

@@ -57,10 +57,17 @@ public class Player : MonoBehaviour
 
         playerController.enabled = false;
         //if bobber lands in water 
-        //canCast = false
-        canCast = false;
-        stillCast = true;
+        if (Bobber.instance.inWater == true)
+        {
+            //canCast = false
+            canCast = false;
+            stillCast = true;
+        }
         //if bobber lands on the ground
+        else
+        {
+            ReelIn();
+        }
         //reverse cast animation and remove bobber
         //cancast = true
     }
@@ -78,8 +85,8 @@ public class Player : MonoBehaviour
     {
         anim.SetBool("Casting", true);
         print("casting anim played");
-        yield return new WaitForSeconds(1.5f);
-
+        yield return new WaitForSeconds(1f);
+        //instantiate bobber at bobberstartpos
         bobber = Instantiate(bobberPrefab, bobberStartPosObj.transform);
         print("starting idle");
         anim.SetBool("IdleCast", true);
