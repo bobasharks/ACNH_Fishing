@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     private float forward;
     private float speed = 6f;
     public bool moving;
-    private GameObject playerModel;
+    public GameObject playerModel;
     private Quaternion startRot;
     //private Vector2 left, right, up, down;
 

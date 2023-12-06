@@ -6,6 +6,7 @@ using UnityEngine;
 /// </summary>
 public class FishSpawner : MonoBehaviour
 {
+    public static FishSpawner instance;
     public GameObject[] waterBlocks;
     public GameObject[] fishPrefabs;
     public GameObject bigFish, medFish, smallFish;
@@ -21,6 +22,8 @@ public class FishSpawner : MonoBehaviour
         //fish = new GameObject[maxFish];
 
         //make an array of all water blocks
+        instance = this;
+
         waterBlocks = GameObject.FindGameObjectsWithTag("Water");
     }
     // Start is called before the first frame update
@@ -39,8 +42,8 @@ public class FishSpawner : MonoBehaviour
             //get a random fish size and water block
             RollRandomFish();
             RollRandomWater();
-            print(selectedBlock);
-            print(selectedFish);
+            //print(selectedBlock);
+            //print(selectedFish);
             //set the spawn point to the pos of the selected water block
             //spawn fish at spawn point
             print("spawning fish");
@@ -61,7 +64,9 @@ public class FishSpawner : MonoBehaviour
     private int RollRandomFish()
     {
        selectedFish = Random.Range(0, 3);
-        print("Selected fish" + selectedFish);
+        //print("Selected fish" + selectedFish);
         return selectedFish;
     }
+
+    
 }
