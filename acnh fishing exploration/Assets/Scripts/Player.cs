@@ -44,6 +44,8 @@ public class Player : MonoBehaviour
     }
     public void Reset()
     {
+        canCast = false;
+        stillCast = false;
         StartCoroutine(ShowOff());
     }
     private void Update()
@@ -57,6 +59,17 @@ public class Player : MonoBehaviour
             print("reeling");
             ReelIn();
 
+        }
+        else if (Input.GetMouseButtonDown(1) && speechBubble.activeSelf)
+        {
+            StopCoroutine(ShowOff());
+            speechBubble.SetActive(false);
+            cameraPivot.transform.rotation = Quaternion.Euler(36.17f,0, 0);
+            //speechBubble.SetActive(false);
+            //cameraPivot.transform.rotation = Quaternion.Euler(36.17f, 0, 0);
+            canCast = true;
+            stillCast = false;
+            playerController.enabled = true;
         }
 
         fishCountText.text = "fish caught: " + fishCount;
@@ -72,8 +85,8 @@ public class Player : MonoBehaviour
 
     public void ReelIn()
     {
-        stillCast = false;
         reeled = true;
+        stillCast = false;
         playerController.enabled = true;
         anim.SetBool("IdleCast", false);
         anim.SetBool("Casting", false);
@@ -82,18 +95,26 @@ public class Player : MonoBehaviour
 
     public IEnumerator ShowOff()
     {
-        fishCount++;
-        //playerController.enabled = true;
-        playerController.playerModel.transform.rotation = Quaternion.Euler(0, 180, 0);
-        cameraPivot.transform.rotation = Quaternion.Euler(0, 0, 0);
+        playerController.enabled = false;
         speechBubble.SetActive(true);
+        Quaternion endRot = Quaternion.Euler(0f,0f,0f);
+        fishCount++;
+        while (cameraPivot.transform.rotation != endRot && playerController.playerModel.transform.rotation != Quaternion.Euler(0,180,0))
+        {
+            cameraPivot.transform.rotation = Quaternion.Slerp(cameraPivot.transform.rotation, endRot, 2f * Time.deltaTime);
+            playerController.playerModel.transform.rotation = Quaternion.Slerp(playerController.playerModel.transform.rotation, Quaternion.Euler(0, 180, 0), 4f * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
+        //playerController.enabled = true;
+        //playerController.playerModel.transform.rotation = Quaternion.Euler(0, 180, 0);
+        //cameraPivot.transform.rotation = Quaternion.Euler(0, 0, 0);
+        print("speech bubble activate");
         
-        yield return new WaitForSeconds(3f);
+        
+        //yield return new WaitForSeconds(1.2f);
+        canCast = false;
+        stillCast = false;
 
-        speechBubble.SetActive(false);
-        cameraPivot.transform.rotation = Quaternion.Euler(36.17f, 0, 0);
-        //speechBubble.SetActive(false);
-        //cameraPivot.transform.rotation = Quaternion.Euler(36.17f, 0, 0);
     }
 
     private IEnumerator CastDelay()
@@ -127,8 +148,13 @@ public class Player : MonoBehaviour
         anim.SetBool("Reel", true);
         Destroy(bobber);
         yield return new WaitForSeconds(1.2f);
+        reeled = false;
         anim.SetBool("Reel", false);
         canCast = true;
-        reeled = false;
+        if (GameObject.FindWithTag("bobber"))
+        {
+            Destroy(GameObject.FindWithTag("bobber"));
+            print("destroyed extra bobber");
+        }
     }
 }

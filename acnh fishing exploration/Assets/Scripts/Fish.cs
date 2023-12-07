@@ -14,6 +14,7 @@ public class Fish : MonoBehaviour
 
     public bool isBiting = false;
     public bool canCatch = false;
+    public bool canMove = true;
 
     public float reelWindow;
 
@@ -37,16 +38,12 @@ public class Fish : MonoBehaviour
             bobberPos = Bobber.instance.gameObject.transform.position;
             if (Vector3.Distance(bobberPos, transform.position) < 3f && isBiting == false)
             {
+                print("fish on!");
                 StartCoroutine(BiteDelay());
                 
             }
             
         }
-        else
-        {
-            return;
-        }
-        
     }
 
     public void Move()
@@ -63,19 +60,37 @@ public class Fish : MonoBehaviour
     {
         inBobberRange = true;
         isMoving = true;
+        canMove = false;
         //print("in range abt to bite");
         isBiting = true;
-        StopCoroutine(MoveDelay());
-        dest = transform.position;
-        transform.position = Vector3.MoveTowards(transform.position, bobberPos, speed * Time.deltaTime);
+        while (Vector3.Distance(new Vector3(bobberPos.x, transform.position.y, bobberPos.z), transform.position) > .1f)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, bobberPos, speed * Time.deltaTime);
+            yield return new WaitForEndOfFrame();
+        }
+        
 
         bites = Random.Range(0, 4); // the number of bites a fish will fake before actually biting
 
         for (int i = 0; i < bites; i++)
         {
+            if (Player.instance.reeled == true)
+            {
+                i = bites;
+                print("fish lost, reeled too early");
+                FishSpawner.instance.fish--;
+                Destroy(gameObject);
+            }
+            if (Bobber.instance == null)
+            {
+                i = bites;
+                print("fish lost, reeled too early");
+                FishSpawner.instance.fish--;
+                Destroy(gameObject);
+            }
             print("bites:" + (bites - i));
             audioSource.Play(0);
-            print("played audio");
+            //print("played audio");
             yield return new WaitForSeconds(2f);
 
         }
@@ -86,17 +101,18 @@ public class Fish : MonoBehaviour
 
     public IEnumerator ReelWindow()
     {
+        canCatch = true;
         bobberPos.y -= .5f;
         Bobber.instance.gameObject.transform.position = bobberPos;
         //print("play splash audio");
         Bobber.instance.audioSource.Play(0);
-        canCatch = true;
+        
         print("click now");
         yield return new WaitForSeconds(reelWindow);
         if (Player.instance.reeled == true && Bobber.instance.fishOnHook == null)
         {
             Bobber.instance.fishOnHook = gameObject;
-            print("fish caught");
+            print("fish catched");
             FishSpawner.instance.fish--;
             Player.instance.Reset();
             Destroy(gameObject);
@@ -121,6 +137,9 @@ public class Fish : MonoBehaviour
         {
             print("fish got away");
             FishSpawner.instance.fish--;
+            canCatch = false;
+            //Player.instance.ReelIn();
+            Bobber.instance.gameObject.transform.position = new Vector3(bobberPos.x, bobberPos.y + .5f, bobberPos.z);
             Destroy(gameObject);
             
         }
@@ -138,7 +157,7 @@ public class Fish : MonoBehaviour
         dest = waterBlocks[destBlock].transform.position;
         dest.y += 1.1f;
         //print(Vector3.Distance(transform.position, dest));
-        while (Vector3.Distance(dest, transform.position) > .1f)
+        while (Vector3.Distance(dest, transform.position) > .1f && canMove == true)
         {
             transform.position = Vector3.MoveTowards(transform.position, dest, speed * Time.deltaTime);
             //print("moving");
